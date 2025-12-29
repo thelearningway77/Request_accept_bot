@@ -1,16 +1,14 @@
 import logging
-from telegram import Update, ChatMemberUpdated
+import os
+from telegram import Update
 from telegram.ext import Application, CommandHandler, ChatMemberHandler, ContextTypes
-from telegram.constants import ChatMemberStatus
 
-# Configure logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Get token from environment
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+ADMIN_IDS = [int(os.environ.get("ADMIN_ID", "0"))]
 
-# Configuration
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
-ADMIN_IDS = [123456789]  # Replace with your Telegram user ID(s)
-
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN not found! Add it in Railway variables.")
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /start command"""
     await update.message.reply_text(
