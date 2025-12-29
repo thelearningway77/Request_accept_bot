@@ -3,12 +3,14 @@ import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ChatMemberHandler, ContextTypes
 
-# Get token from environment
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-ADMIN_IDS = [int(os.environ.get("ADMIN_ID", "0"))]
+# Configure logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN not found! Add it in Railway variables.")
+# Configuration
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
+ADMIN_IDS = [int(os.environ.get("ADMIN_ID", "123456789"))]
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /start command"""
     await update.message.reply_text(
@@ -61,19 +63,6 @@ async def handle_join_request(update: Update, context: ContextTypes.DEFAULT_TYPE
         
     except Exception as e:
         logger.error(f"Error approving join request: {e}")
-        
-        # Notify admins of error
-        for admin_id in ADMIN_IDS:
-            try:
-                await context.bot.send_message(
-                    chat_id=admin_id,
-                    text=f"❌ Failed to approve join request:\n\n"
-                         f"User: {user.first_name} (@{user.username or 'N/A'})\n"
-                         f"Group: {chat.title}\n"
-                         f"Error: {str(e)}"
-                )
-            except:
-                pass
 
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show bot stats (admin only)"""
@@ -113,15 +102,9 @@ def main():
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("stats", stats))
     
-    # Handle join requests
+    # Handle join requests (using -1 for chat_join_request)
     application.add_handler(ChatMemberHandler(handle_join_request, -1))
-```
-
-The `-1` is the code for join requests in the telegram library.
-
-**Also update `requirements.txt` to:**
-```
-python-telegram-bot==20.8
+    
     # Start bot
     logger.info("🤖 Auto-Accept Bot started!")
     logger.info("Monitoring join requests...")
@@ -129,3 +112,4 @@ python-telegram-bot==20.8
 
 if __name__ == '__main__':
     main()
+```
