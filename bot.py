@@ -114,8 +114,14 @@ def main():
     application.add_handler(CommandHandler("stats", stats))
     
     # Handle join requests
-    application.add_handler(ChatMemberHandler(handle_join_request, ChatMemberHandler.CHAT_JOIN_REQUEST))
-    
+    application.add_handler(ChatMemberHandler(handle_join_request, -1))
+```
+
+The `-1` is the code for join requests in the telegram library.
+
+**Also update `requirements.txt` to:**
+```
+python-telegram-bot==20.8
     # Start bot
     logger.info("🤖 Auto-Accept Bot started!")
     logger.info("Monitoring join requests...")
